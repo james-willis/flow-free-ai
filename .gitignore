@@ -1,0 +1,60 @@
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+*.db
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# python files #
+################
+__pycache__/
+*.egg-info/
+venv/
+*.pyc
+
+# IDE files #
+#############
+.idea/
+.sublimelinterrc
+*.sublime-project
+*.sublime-workspace
+pylintrc
+
+# venv and project specific files #
+###################################
+celerybeat-schedule
+db_repository
+tmp/
+redis-stable/
