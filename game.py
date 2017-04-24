@@ -1,7 +1,6 @@
 class GameInstance(object):
     """
-    A instance of a game of Flow Free
-    designed for an AI to play
+    A instance of a game of Flow Free designed for an AI or person to play
     """
     def __init__(self, dim, dots):
         self.board = [[self.Tile()] * dim for _ in range(dim)]
@@ -25,7 +24,7 @@ class GameInstance(object):
 
     def color_tile(self, previous, current):
         """
-        updates the gameboard to add a valid tile to a path
+        updates the gameboard to add a tile to a path
         """
         previous_tile = self.board[previous[0]][previous[1]]
         current_tile = self.board[current[0]][current[1]]
@@ -35,7 +34,7 @@ class GameInstance(object):
                 raise IndexError("Previous and current tiles must be within dimensions of\
                     gameboard")
 
-        if current_tile.is_dot:
+        if current_tile.is_dot and previous_tile.color != current_tile.color:
             raise ValueError("Cannot draw on dot")
 
         if  previous_tile.next:
@@ -78,6 +77,6 @@ class GameInstance(object):
 
     def game_won(self):
         """
-
+        returns a boolean indicating whether the current state of the boad is a winning configuration
         """
         raise NotImplementedError
