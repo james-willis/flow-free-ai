@@ -2,6 +2,7 @@ class GameInstance(object):
     """
     A instance of a game of Flow Free designed for an AI or person to play
     """
+    #TODO look into pairing dots together to allow only one line of each color to exist at a time.
     def __init__(self, dim, dots):
         self.board = [[self.Tile()] * dim for _ in range(dim)]
         self.dots = dots
@@ -75,6 +76,7 @@ class GameInstance(object):
 
     def game_won(self):
         """
-        returns a boolean indicating whether the current state of the boad is a winning configuration
+        returns a boolean indicating whether the current state of the boad is a winning
+        configuration
         """
         raise NotImplementedError
