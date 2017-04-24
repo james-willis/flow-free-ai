@@ -48,9 +48,7 @@ class GameInstance(object):
 
         # if the theres already a line here, delete all the lines of that color
         if current_tile.color:
-            for dot in self.dots:
-                if dot.color == current_tile.color:
-                    self.remove_line(dot)
+            self.remove_line(current)
 
 
         previous_tile.next = current_tile
@@ -58,15 +56,15 @@ class GameInstance(object):
 
     def remove_line(self, origin):
         """
-        removes a valid line drawn by a player. line must start from a dot
+        removes a valid line drawn by a player. deletes line from origin following links of next,
+        until the path ends or a dot is encoutered.
         """
         current_tile = self.board[origin[0]][origin[1]]
 
-        if not current_tile.is_dot:
-            raise ValueError("origin must be a dot")
-
-        # nothing needs to be done to dot
-        current_tile = current_tile.next
+        if current_tile.is_dot:
+            temp = current_tile.next
+            current_tile.next = None
+            current_tile = temp
 
         # remove color of all non dot tiles in line
         while current_tile.color and not current_tile.is_dot:
