@@ -4,37 +4,34 @@ This module is designed to represent an instance of the game Flow Free, Flow Fre
 created by Big Duck Games, and is available on iOS and Android devices. This modules attempts to
 replicate the behavior of the game as closely as possible, and is designed with human and AI
 players in mind.
-
 """
 
 
 class GameInstance(object):
-
-    """Represent a game of Flow Free and the behaviors required to play the game.
+    """Represents a game of Flow Free and the behaviors required to play the game.
 
     Attributes:
-        dim (int): the dimension of the gameboard.
-        board (:obj:`list` of  :obj:`tile`): A two dimensional (dim x dim) list of the tiles that
+        dimension: The int dimension of the gameboard.
+        board: A two dimensional (dimension x dimension) list of the Tiles that
             comprise the gameboard.
-        dots (:obj:`list` of :obj:`dots`): A list of all of the dots on the gameboard.
-
+        dots: A list of all of the Dots on the gameboard.
     """
 
     def __init__(self, dim, dots):
         self.board = [[self.Tile()] * dim for _ in range(dim)]
         self.dots = dots
-        self.dim = dim
+        self.dimension = dimension
 
         for dot in dots:
-            self.board[dot.x][dot.y] = self.Tile(True, dot.color)
+            self.board[dot.x][dot.y] = self.Tile(is_dot=True, color=dot.color)
 
     class Tile(object):
         """A tile to represent a single position on a Flow Free board.
 
         Attributes:
-            is_dot (boolean): Indicates if the tile contains a dot.
-            color (str): Indicates the color of the tile.
-            next (:obj:`tile`): The next tile in line.  Is None if no next item in line.
+            is_dot: Whether the tile contains a dot.
+            color: The string color of the tile.
+            next: The next Tile in line.  Is None if no next item in line.
 
         """
         def __init__(self, is_dot=False, color=None):
@@ -43,12 +40,12 @@ class GameInstance(object):
             self.next = None
 
     class Dot(object):
-        """Represent a dot on the gameboard.
+        """Represents a dot on the gameboard.
 
         Attributes:
-            x (int): the x coordinate of the location of the dot on the gameboard.
-            y (int): the y coordinate of the location of the dot on the gameboard.
-            color (str): the color of the dot, there will be exactly two dots of each color on a
+            x: The int x coordinate of the location of the dot on the gameboard.
+            y: The int y coordinate of the location of the dot on the gameboard.
+            color: The string color of the dot. There will be exactly two dots of each color on a
                 given board.
         """
         def __init__(self, x, y, color):
@@ -60,11 +57,11 @@ class GameInstance(object):
         """Updates the gameboard to add a tile to a path.
 
         Args:
-            previous (:obj:`tuple` of :obj:`int`): a tuple of the location of the end of the line
-                you'd like to expand. The first element is the x coordinate and the second element
-                is the y coordinate.
-            current (:obj:`tuple` of :obj:`int`): a tuple of the location of tile to add to the
-                line. The first element is the x coordinate and the second element is the y
+            previous: A tuple representing the location of the end of the line
+                you'd like to expand. The first element is the int x coordinate and the second element
+                is the int y coordinate.
+            current: A tuple representing the location of Tile to add to the
+                line. The first element is the int x coordinate and the second element is the int y
                 coordinate.
         Raises:
             IndexError: If either of the args is outside the bounds of the gameboard.
@@ -75,7 +72,7 @@ class GameInstance(object):
         current_tile = self.board[current[0]][current[1]]
 
         for dim in previous + current:
-            if not 0 <= dim < self.dim:
+            if not 0 <= dim < self.dimension:
                 raise IndexError("Previous and current tiles must be within dimensions of\
                     gameboard")
 
@@ -109,15 +106,15 @@ class GameInstance(object):
         current_tile.color = previous_tile.color
 
     def remove_line(self, origin):
-        """Remove a line drawn from the gameboard.
+        """Removes a line drawn from the gameboard.
 
         The path is removed from the provided origin argument and delete the line following the
         linked list of `next ` values until a dot is encountered or  the line ends.
 
         Args:
-            origin (:obj:`tuple` of :obj:`int`): a tuple of the location of the tile to begin line
-                removal from. The first element is the x coordinate and the second element is the y
-                coordinate.
+            origin: A tuple of the location of the Tile to begin line
+                removal from. The first element is the int x coordinate and the second element
+                is the int y coordinate.
         """
         current_tile = self.board[origin[0]][origin[1]]
 
@@ -134,12 +131,12 @@ class GameInstance(object):
             current_tile = temp
 
     def game_won(self):
-        """Determine if the current board is a winning configuration.
+        """Determines if the current board is a winning configuration.
 
         A winning configuration means that all dots are connected via lines to their pair (other dot
         of the same color) and all tiles have a color.
 
-        Return:
+        Returns:
             True if the board is a winning configuration, False otherwise.
         """
         raise NotImplementedError
