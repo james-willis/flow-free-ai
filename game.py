@@ -6,6 +6,8 @@ replicate the behavior of the game as closely as possible, and is designed with 
 players in mind.
 """
 
+from functools import reduce
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -61,7 +63,28 @@ class GameInstance(object):
         self.dimension = dimension
 
         for dot in dots:
+            if self.board[dot.x][dot.y].is_dot:
+                raise ValueError("Only one dot per tile")
             self.board[dot.x][dot.y] = _Tile(True, dot.color)
+
+        if not self.vaild_dots():
+            raise ValueError("Invalid GameBoard")
+
+    def vaild_dots(self):
+        """Determines if the puzzle presented is valid.
+
+        To be valid a game must have two dots of every color.
+
+        Returns:
+            Whether the game board is a valid setup.
+        """
+        dot_dict = {}
+        for dot in self.dots:
+            if dot.color in dot_dict:
+                dot_dict[dot.color] += 1
+            else:
+                dot_dict[dot.color] = 1
+        return reduce((lambda x, y: x and y), (x == 2 for x in dot_dict.values()))
 
     def color_tile(self, previous, current):
         """Updates the gameboard to add a tile to a path.
@@ -151,7 +174,7 @@ class GameInstance(object):
         display = plt.figure()
 
         # Plots dots.
-        for dot in dots:
+        for dot in self.dots:
             plt.scatter(dot.x + .5, dot.y + .5, color=dot.color, s=1000)
 
         # Makes a uniform grid,
@@ -203,6 +226,6 @@ class GameInstance(object):
         return not colors
 
 if __name__ == "__main__":
-    dots = [Dot(x, x, 'red') for x in range(6)]
-    x = GameInstance(6, dots)
-    x.display_game()
+    test_dots = [Dot(x, x, 'red') for x in range(6)]
+    game = GameInstance(6, test_dots)
+    game.display_game()
