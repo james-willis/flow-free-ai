@@ -7,6 +7,41 @@ players in mind.
 
 """
 
+class _Tile(object):
+    """A tile to represent a single position on a Flow Free board.
+
+    Attributes:
+        is_dot (boolean): Indicates if the tile contains a dot.
+        color (str): Indicates the color of the tile.
+        next (:obj:`tile`): The next tile in line.  Is None if no next item in line.
+
+    """
+    def __init__(self, is_dot=False, color=None):
+        self.is_dot = is_dot
+        self.color = color
+        self.next = None
+
+    def line_end(self):
+        """returns the tile at the terminus of the line by following the next values"""
+        curr = self
+        while curr.next:
+            curr = curr.next
+        return curr
+
+class _Dot(object):
+    """Represent a dot on the gameboard.
+
+    Attributes:
+        x (int): the x coordinate of the location of the dot on the gameboard.
+        y (int): the y coordinate of the location of the dot on the gameboard.
+        color (str): the color of the dot, there will be exactly two dots of each color on a
+            given board.
+    """
+    def __init__(self, x, y, color):
+        self.x = x
+        self.y = y
+        self.color = color
+
 
 class GameInstance(object):
 
@@ -21,40 +56,12 @@ class GameInstance(object):
     """
 
     def __init__(self, dim, dots):
-        self.board = [[self.Tile()] * dim for _ in range(dim)]
+        self.board = [[_Tile()] * dim for _ in range(dim)]
         self.dots = dots
         self.dim = dim
 
         for dot in dots:
-            self.board[dot.x][dot.y] = self.Tile(True, dot.color)
-
-    class Tile(object):
-        """A tile to represent a single position on a Flow Free board.
-
-        Attributes:
-            is_dot (boolean): Indicates if the tile contains a dot.
-            color (str): Indicates the color of the tile.
-            next (:obj:`tile`): The next tile in line.  Is None if no next item in line.
-
-        """
-        def __init__(self, is_dot=False, color=None):
-            self.is_dot = is_dot
-            self.color = color
-            self.next = None
-
-    class Dot(object):
-        """Represent a dot on the gameboard.
-
-        Attributes:
-            x (int): the x coordinate of the location of the dot on the gameboard.
-            y (int): the y coordinate of the location of the dot on the gameboard.
-            color (str): the color of the dot, there will be exactly two dots of each color on a
-                given board.
-        """
-        def __init__(self, x, y, color):
-            self.x = x
-            self.y = y
-            self.color = color
+            self.board[dot.x][dot.y] = _Tile(True, dot.color)
 
     def color_tile(self, previous, current):
         """Updates the gameboard to add a tile to a path.
@@ -68,8 +75,8 @@ class GameInstance(object):
                 coordinate.
         Raises:
             IndexError: If either of the args is outside the bounds of the gameboard.
-            ValueError: If the tile to be colored is not at the end of a line or is a dot of a
-                different color from the line.
+            ValueError: If the tile to be colored is not at the end of a line, is a dot of a
+                different color from the line, or is the tile the line starts from.
         """
         previous_tile = self.board[previous[0]][previous[1]]
         current_tile = self.board[current[0]][current[1]]
@@ -81,6 +88,11 @@ class GameInstance(object):
 
         if current_tile.is_dot and previous_tile.color != current_tile.color:
             raise ValueError("Cannot draw on dot")
+
+        if current_tile.is_dot and current_tile.next:
+            # If the dot has a next value then it must be the same dot the line starts from since
+            # 2 lines of the same color cannot exist.
+            raise ValueError("cannot start and end line at same dot")
 
         if  previous_tile.next:
             raise ValueError("Previous tile must be the end of line")
@@ -142,4 +154,27 @@ class GameInstance(object):
         Return:
             True if the board is a winning configuration, False otherwise.
         """
-        raise NotImplementedError
+
+        # Makes sure every tile is colored
+        for column in self.board:
+            for tile in column:
+                if not tile.color:
+                    return False
+
+        # Makes sure each color has a line.
+        colors = set()
+        for dot in self.dots:
+            dot_tile = self.board[dot.x][dot.y]
+            colors += dot.color
+        for dot in self.dots:
+            dot_tile = self.board[dot.x][dot.y]
+            # If we've already found a line for this color.
+            if dot.color not in colors:
+                continue
+            # If this dot starts a line and ends at the other dot.
+            if dot_tile.next and not dot_tile.line_end().is_dot:
+                return False
+            elif dot_tile.next:
+                colors.remove(dot.color)
+        # If colors isn't empty, not all colors have lines.
+        return not colors
