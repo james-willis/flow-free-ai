@@ -46,6 +46,7 @@ venv/
 
 # IDE files #
 #############
+.cache/
 .idea/
 .sublimelinterrc
 *.sublime-project

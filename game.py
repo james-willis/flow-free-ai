@@ -20,7 +20,7 @@ class _Tile(object):
         next: The next _Tile in line.  Is None if no next item in line.
 
     """
-    def __init__(self, is_dot=False, color=None):
+    def __init__(self, *, is_dot=False, color=None):
         self.is_dot = is_dot
         self.color = color
         self.next = None
@@ -65,12 +65,12 @@ class GameInstance(object):
         for dot in dots:
             if self.board[dot.x][dot.y].is_dot:
                 raise ValueError("Only one dot per tile")
-            self.board[dot.x][dot.y] = _Tile(True, dot.color)
+            self.board[dot.x][dot.y] = _Tile(is_dot=True, color=dot.color)
 
-        if not self.vaild_dots():
+        if not self.valid_dots():
             raise ValueError("Invalid GameBoard")
 
-    def vaild_dots(self):
+    def valid_dots(self):
         """Determines if the puzzle presented is valid.
 
         To be valid a game must have two dots of every color.
@@ -126,7 +126,7 @@ class GameInstance(object):
             other_dot = None
             for dot in self.dots:
                 # If its the other dot of the same color.
-                if dot.x != previous[0] and dot.y != previous[1] and dot.color == previous.color:
+                if dot.x != previous[0] and dot.y != previous[1] and dot.color == previous_tile.color:
                     other_dot = dot
             self.remove_line((other_dot.x, other_dot.y))
 
@@ -137,8 +137,8 @@ class GameInstance(object):
             raise ValueError("cannot start and end line at same dot")
 
         # If theres already a line here, delete the existing line from current tile.
-        if current_tile.color:
-            self.remove_line(current)
+        # if current_tile.color:
+        #     self.remove_line(current)
 
 
         previous_tile.next = current_tile
