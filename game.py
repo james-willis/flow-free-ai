@@ -58,7 +58,7 @@ class GameInstance(object):
     """
 
     def __init__(self, dimension, dots):
-        self.board = [[_Tile()] * dimension for _ in range(dimension)]
+        self.board = [[_Tile() for _ in range(dimension)] for _ in range(dimension)]
         self.dots = dots
         self.dimension = dimension
 
@@ -137,12 +137,19 @@ class GameInstance(object):
             raise ValueError("cannot start and end line at same dot")
 
         # If theres already a line here, delete the existing line from current tile.
-        # if current_tile.color:
-        #     self.remove_line(current)
+        if current_tile.color:
+            self.remove_line(self._previous(current))
 
 
         previous_tile.next = current_tile
         current_tile.color = previous_tile.color
+
+    def _previous(self, coord):
+        """Returns the prior element in a given line, if no prior element, returns None"""
+        candidates = [(coord[0] - 1, coord[1]), (coord[0] + 1, coord[1]), (coord[0], coord[1] - 1), (coord[0], coord[1] + 1)]
+        for candidate in (x for x in candidates if 0 <= x[0] < self.dimension and 0 <= x[1] < self.dimension):
+            if self.board[candidate[0]][candidate[1]].next == self.board[coord[0]][coord[1]]:
+                return candidate
 
     def remove_line(self, origin):
         """Removes a line drawn from the gameboard.

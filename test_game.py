@@ -43,14 +43,17 @@ class TestGameInstance(object):
 
 	def test_valid_color_tile(self):
 		game = GameInstance(self.dim, self.valid_dots)
+
 		# tile at (1,1) is a blue dot
 		game.color_tile((1, 1), (1, 2))
 		assert game.board[1][2].color == 'blue'
 		assert game.board[1][1].next == game.board[1][2]
 		assert not game.board[1][2].next
+
 		game.color_tile((1, 2), (1, 3))
 		assert game.board[1][2].next == game.board[1][3]
 		assert game.board[1][3].color == 'blue'
+		assert not game.board[1][3].next
 		game.color_tile((1, 3), (2, 3))
 
 		# finish the flow
@@ -63,7 +66,7 @@ class TestGameInstance(object):
 		game.color_tile((2, 2), (1, 2))
 		assert game.board[1][2].color == 'red'
 		assert not game.board[1][2].next
-		assert game.boad[1][1].line_end() == game.board[1][1]
+		assert game.board[1][1].line_end() == game.board[1][1]
 		assert not game.board[1][3].next
 
 	def test_invalid_color_tile(self):
@@ -89,3 +92,32 @@ class TestGameInstance(object):
 		# draw tile not from end of line
 		with pytest.raises(ValueError):
 			game.color_tile((1, 1), (0, 1))
+
+	def test_remove_line(self):
+		game = GameInstance(self.dim, self.valid_dots)
+		game.remove_line((1, 1))
+		assert game.board[1][1].line_end() == game.board[1][1]
+
+		game.board[1][1].next = game.board[1][2]
+		game.board[1][2].color = 'blue'
+		game.board[1][2].next = game.board[1][3]
+		game.board[1][3].color = 'blue'
+		game.remove_line((1, 1))
+		assert game.board[1][1].line_end() == game.board[1][1]
+
+		game.board[1][1].next = game.board[1][2]
+		game.board[1][2].color = 'blue'
+		game.board[1][2].next = game.board[1][3]
+		game.board[1][3].color = 'blue'
+		game.remove_line((1, 2))
+		assert game.board[1][1].line_end() == game.board[1][2]
+
+	def test_previous(self):
+		game = GameInstance(self.dim, self.valid_dots)
+		game.board[1][1].next = game.board[1][2]
+		game.board[1][2].color = 'blue'
+		game.board[1][2].next = game.board[1][3]
+		game.board[1][3].color = 'blue'
+		assert game._previous((1,3)) == (1,2)
+		assert game._previous((1,2)) == (1,1)
+		assert game._previous((1,1)) == None
