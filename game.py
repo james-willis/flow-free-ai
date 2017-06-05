@@ -126,7 +126,7 @@ class GameInstance(object):
             other_dot = None
             for dot in self.dots:
                 # If its the other dot of the same color.
-                if dot.x != previous[0] and dot.y != previous[1] and dot.color == previous_tile.color:
+                if (dot.x != previous[0] or dot.y != previous[1]) and dot.color == previous_tile.color:
                     other_dot = dot
             self.remove_line((other_dot.x, other_dot.y))
 
@@ -137,7 +137,7 @@ class GameInstance(object):
             raise ValueError("cannot start and end line at same dot")
 
         # If theres already a line here, delete the existing line from current tile.
-        if current_tile.color:
+        if current_tile.color and not current_tile.is_dot:
             self.remove_line(self._previous(current))
 
 
@@ -218,7 +218,7 @@ class GameInstance(object):
         colors = set()
         for dot in self.dots:
             dot_tile = self.board[dot.x][dot.y]
-            colors += dot.color
+            colors.add(dot.color)
         for dot in self.dots:
             dot_tile = self.board[dot.x][dot.y]
             # If we've already found a line for this color.

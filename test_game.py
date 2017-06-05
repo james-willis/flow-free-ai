@@ -118,6 +118,52 @@ class TestGameInstance(object):
 		game.board[1][2].color = 'blue'
 		game.board[1][2].next = game.board[1][3]
 		game.board[1][3].color = 'blue'
+		game.board[2][3].color = 'blue'
 		assert game._previous((1,3)) == (1,2)
 		assert game._previous((1,2)) == (1,1)
 		assert game._previous((1,1)) == None
+		assert game._previous((2,3)) == None
+
+	def test_won(self):
+		winnable_dots = [Dot(0, 0, 'green'), Dot(3, 3, 'green'),
+						 Dot(1, 0, 'yellow'), Dot(3, 0, 'yellow'),
+						 Dot(4, 0, 'orange'), Dot(2, 2, 'orange'),
+						 Dot(0, 2, 'red'), Dot(3, 4, 'red'),
+						 Dot(3, 2, 'blue'), Dot(4, 4, 'blue')]
+		game = GameInstance(self.dim, winnable_dots)
+		assert not game.game_won()
+
+		# green
+		game.color_tile((0, 0), (0, 1))
+		game.color_tile((0, 1), (1, 1))
+		game.color_tile((1, 1), (1, 2))
+		game.color_tile((1, 2), (1, 3))
+		game.color_tile((1, 3), (2, 3))
+		game.color_tile((2, 3), (3, 3))
+		assert not game.game_won()
+
+		# yellow
+		game.color_tile((1, 0), (2, 0))
+		game.color_tile((2, 0), (3, 0))
+		assert not game.game_won()
+
+		# orange
+		game.color_tile((4, 0), (4, 1))
+		game.color_tile((4, 1), (3, 1))
+		game.color_tile((3, 1), (2, 1))
+		game.color_tile((2, 1), (2, 2))
+		assert not game.game_won()
+
+		# blue
+		game.color_tile((3, 2), (4, 2))
+		game.color_tile((4, 2), (4, 3))
+		game.color_tile((4, 3), (4, 4))
+		assert not game.game_won()
+
+		# red 
+		game.color_tile((0, 2), (0, 3))
+		game.color_tile((0, 3), (0, 4))
+		game.color_tile((0, 4), (1, 4))
+		game.color_tile((1, 4), (2, 4))
+		game.color_tile((2, 4), (3, 4))
+		assert  game.game_won()
